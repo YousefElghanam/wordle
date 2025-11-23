@@ -1,8 +1,9 @@
-use std::io::Read;
-use std::fs::File;
-use rand_set::RandSet;
-use colored::*;
-use rustyline::{DefaultEditor, Result, error::ReadlineError};
+use	std::io::Read;
+use	std::fs::File;
+use	std::process::exit;
+use	rand_set::RandSet;
+use	colored::*;
+use	rustyline::{DefaultEditor, Result, error::ReadlineError};
 
 const WHITE: i8 = 0;
 const GREEN: i8 = 1;
@@ -25,12 +26,13 @@ fn  load_dict() -> RandSet<String> {
 						dict.insert(word.to_ascii_lowercase().to_string());
 				}
 				else {
-					println!("WARNING: '{}' in dictionary is not alphabetic. Skipping it", word);
+					println!("{}{}{}{}", "WARNING".yellow(), ": ", word.red(), "in dictionary is not alphabetic. Skipping it");
 				}
 			}
 		}
 		Err(err) => {
-			println!("ERROR: {err} in words.txt");
+			eprintln!("{}{}{}", "ERROR".red(), ": Couldn't open dictionary 'words.txt': ", err);
+			exit(1);
 		}
 	}
 	dict
@@ -58,19 +60,21 @@ fn	print_colorized_word(answer: &String, mut ans_freq: [i32; 26], word: &(String
 		if answer.contains(c) && ans_freq[((c as u8).to_ascii_lowercase() - b'a') as usize] > 0 {
 			if cpy.1[i] == WHITE {
 				cpy.1[i] = YELLOW;
+				ans_freq[((c as u8).to_ascii_lowercase() - b'a') as usize] -= 1;
 			}
 		}
 	}
-	print!("  ");
+	print!(" ");
 	for (i, c) in cpy.0.char_indices() {
+		print!(" ");
 		if cpy.1[i] == GREEN {
-			print!("{}", c.to_string().green());
+			print!("{}", c.to_string().to_ascii_uppercase().green());
 		}
 		else if cpy.1[i] == YELLOW {
-			print!("{}", c.to_string().yellow());
+			print!("{}", c.to_string().to_ascii_uppercase().yellow());
 		}
 		else {
-			print!("{}", c.to_string());
+			print!("{}", c.to_string().to_ascii_uppercase());
 		}
 	}
 	print!("\n");
@@ -89,7 +93,7 @@ fn	display_map(answer: String, ans_freq: [i32; 26], map: &Vec<String>) {
 			else {
 				print!(" ");
 			}
-			println!(" _____");
+			println!(" _ _ _ _ _");
 		}
 		else {
 			word.0 = map[i].to_string();
@@ -117,7 +121,7 @@ fn  main() -> Result<()> {
 	println!("Guess the word");
 
 	/* DEBUG */
-	println!("looking for {}. shshshs :D", answer.unwrap().green());
+	// println!("looking for {}. shshshs :D", answer.unwrap().green());
 
 	print!("\x1B[2J\x1B[1;1H");
 	display_map(answer.unwrap().to_string(), ans_freq, &map);
@@ -138,11 +142,11 @@ fn  main() -> Result<()> {
 					continue;
 				}
                 let _ = rl.add_history_entry(word.trim());
-				if dict.contains(&word) {
-					map[tries] = word.clone();
+				if dict.contains(&word.to_ascii_lowercase()) {
+					map[tries] = word.to_ascii_lowercase().clone();
 					print!("\x1B[2J\x1B[1;1H");
 					display_map(answer.unwrap().to_string(), ans_freq, &map);
-					if answer.unwrap() == &word {
+					if answer.unwrap() == &word.to_ascii_lowercase() {
 						println!("YOU WIN");
 						break Ok(());
 					}
@@ -166,7 +170,7 @@ fn  main() -> Result<()> {
 				break Ok(());
 			}
 			Err(err) => {
-				eprintln!("{} {}", "Error ".red(), err);
+				eprintln!("{} {}", "ERROR ".red(), err);
 				break Ok(());
 			}
 		}
