@@ -32,9 +32,9 @@ fn  load_dict() -> RandSet<String> {
 	dict
 }
 
-fn	display_guesses(answer: String, guess: String) {
-	// ADD LOGIC HERE
-}
+// fn	display_guesses(answer: String, guess: String) {
+// 	// ADD LOGIC HERE
+// }
 
 fn  main() -> Result<()> {
 	let mut	rl = DefaultEditor::new()?;
@@ -70,9 +70,9 @@ fn  main() -> Result<()> {
 						println!("YOU WIN");
 						break Ok(());
 					}
-				else {
-					display_guesses(answer.unwrap().to_string(), word);
-				}
+				// else {
+				// 	display_guesses(answer.unwrap().to_string(), word);
+				// }
 				}
 				else {
 					println!("{} '{}' {}", "Word ".yellow(), word.red(), "is not in dictionary".yellow());
